@@ -26,14 +26,14 @@ Interfaccia in italiano con **i18n completo** (IT/EN/ES/FR/DE/PT + lingua di sis
 
 | Artefatto | Descrizione | Dimensione |
 |---|---|---|
-| `Photo-Restore_0.2.0_x64-setup.exe` | **Installer NSIS** — 9 modelli AI + runtime ONNX inclusi, nessun download; installa in `%LOCALAPPDATA%\Photo Restore` | ~761 MB |
-| `PhotoRestore-portable-win-x64-0.2.0.zip` | **Versione portatile** — scompatta ovunque ed esegui `photo-restore-app.exe`; nessuna installazione, il programma non scrive nulla nel registro di sistema | ~717 MB |
+| `Photo-Restore_0.2.0_x64-setup.exe` | **Installer NSIS** — 9 modelli AI + runtime ONNX inclusi, nessun download; crea la voce in "App e funzionalità" | ~726 MiB |
+| `PhotoRestore-portable-win-x64-0.2.0.zip` | **Versione portatile** — scompatta ovunque ed esegui `photo-restore-app.exe`; nessuna installazione, il programma non scrive nulla nel registro di sistema | ~750 MiB |
 
 Requisiti Windows: WebView2 Runtime (già presente in Windows 11; su Windows 10 l'installer lo integra da solo tramite bootstrapper — la versione portatile lo usa se già installato). CPU-only: nessuna GPU richiesta.
 
-**Verifica integrità**: i file sono noti con i seguenti SHA-256 (calcolati al momento del caricamento; li trovi anche nel messaggio della release):
-- installer: vedi release
-- portatile: vedi release
+**Verifica integrità (SHA-256)**:
+- `Photo-Restore_0.2.0_x64-setup.exe`: `AF61375E355C12265D7A1FF75A2C614BB93B5C850DAD7F44F0FE650B4FFFDEB0`
+- `PhotoRestore-portable-win-x64-0.2.0.zip`: `CEB72C1D5546F9FCE76838D250EBA6AD6F2D041B7451AD571D609C912B94B098`
 
 ### Portatile vs installer
 - l'installer aggiunge la voce in "App e funzionalità" e gestisce l'aggiornamento di WebView2.
