@@ -1,0 +1,33 @@
+[package]
+name = "photo-restore-app"
+version = "0.2.0"
+description = "Photo Restore: restauro fotografico desktop"
+license = "MIT"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[lib]
+name = "photo_restore_lib"
+crate-type = ["rlib"]
+
+[[bin]]
+name = "photo-restore-app"
+path = "src/main.rs"
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+rayon.workspace = true
+image.workspace = true
+pr-core = { path = "../core" }
+pr-inference = { path = "../inference" }
+zip = { version = "9", default-features = false, features = ["deflate"] }
+rfd = "0.15"
+ureq = { version = "2", default-features = false, features = ["tls", "gzip"] }
+sha2 = "0.10"
+hex = "0.4"
+base64 = "0.22"

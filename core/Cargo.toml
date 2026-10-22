@@ -1,0 +1,13 @@
+[package]
+name = "pr-core"
+version = "0.2.0"
+edition = "2021"
+license = "MIT"
+description = "Motore di elaborazione immagini di Photo Restore (in Rust puro, senza UI)"
+
+[dependencies]
+image.workspace = true
+imageproc.workspace = true
+rayon.workspace = true
+serde.workspace = true
+thiserror.workspace = true

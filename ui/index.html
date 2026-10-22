@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Photo Restore - Restauro fotografico</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header id="topbar">
+    <div class="brand">
+      <strong>Photo Restore</strong>
+    </div>
+
+    <div class="toolbar">
+      <button id="btn-import" class="primary" type="button" data-i18n="importa">Importa foto</button>
+      <span class="sep"></span>
+      <button id="btn-undo" class="iconic" type="button" data-i18n-title="annulla" title="Annulla" disabled>&#8630;</button>
+      <button id="btn-redo" class="iconic" type="button" data-i18n-title="ripristina" title="Ripristina" disabled>&#8631;</button>
+      <button id="btn-reset" class="iconic" type="button" data-i18n-title="originale" title="Torna all'originale" disabled>&#10226;</button>
+      <span class="sep"></span>
+      <div id="doc-info" data-i18n-title="foto-aperta" title="Foto aperta: nome, dimensioni attuali, megapixel">--</div>
+      <span class="sep"></span>
+      <div class="compare-mode" role="radiogroup" data-i18n-aria="modalita-confronto" aria-label="Modalita' di confronto">
+        <label data-i18n-title="cmp-attuale" title="Confronto: mostra la versione attuale"><input type="radio" name="compare" value="dopo" checked /><span data-i18n="dopo">Dopo</span></label>
+        <label data-i18n-title="cmp-originale" title="Confronto: mostra la foto originale"><input type="radio" name="compare" value="prima" /><span data-i18n="prima">Prima</span></label>
+        <label data-i18n-title="cmp-linea" title="Confronto: linea originale/elaborata da trascinare"><input type="radio" name="compare" value="divisore" /><span data-i18n="divisore">Divisore</span></label>
+        <label data-i18n-title="cmp-affiancate" title="Confronto: le due versioni affiancate"><input type="radio" name="compare" value="affiancato" /><span data-i18n="affiancato">Affiancato</span></label>
+      </div>
+      <span class="sep"></span>
+      <div class="zoombox">
+        <button id="btn-zoom-out" type="button" data-i18n-title="riduci" title="Riduci">-</button>
+        <input id="zoom-range" type="range" min="5" max="400" value="100" data-i18n-title="zoom" title="Zoom" />
+        <button id="btn-zoom-in" type="button" data-i18n-title="ingrandisci" title="Ingrandisci">+</button>
+        <button id="btn-zoom-fit" type="button" data-i18n-title="adatta" title="Adatta" data-i18n="adatta">Adatta</button>
+        <span id="zoom-label">100%</span>
+      </div>
+      <button id="btn-settings" class="iconic" type="button" data-i18n-title="impostazioni" title="Impostazioni">&#9881;</button>
+      <button id="btn-log" class="ghost" type="button" data-i18n="log">Log</button>
+      <button id="btn-dona" type="button" data-i18n-title="dona" title="Il progetto e' gratuito: sostienilo con una donazione PayPal a sasxdj@gmail.com">&#10084;</button>
+    </div>
+  </header>
+
+  <nav id="tool-nav" data-i18n-aria="tappe" aria-label="Tappe del restauro">
+    <button class="step" data-step="detect" type="button"><span class="num">1</span><span class="lbl" data-i18n="step-ritaglia">Ritaglia</span><span class="done"></span></button>
+    <button class="step" data-step="resize" type="button"><span class="num">2</span><span class="lbl" data-i18n="step-dimensioni">Dimensioni</span><span class="done"></span></button>
+    <button class="step" data-step="adjust" type="button"><span class="num">3</span><span class="lbl" data-i18n="step-colori">Colori</span><span class="done"></span></button>
+    <button class="step" data-step="bg" type="button"><span class="num">4</span><span class="lbl" data-i18n="step-sfondo">Sfondo</span><span class="done"></span></button>
+    <button class="step" data-step="volto" type="button"><span class="num">5</span><span class="lbl" data-i18n="step-volti">Volti AI</span><span class="star">&#9733;</span><span class="done"></span></button>
+    <button class="step" data-step="ai" type="button"><span class="num">6</span><span class="lbl" data-i18n="step-ingrandisci">Ingrandisci AI</span><span class="star">&#9733;</span><span class="done"></span></button>
+    <button class="step save" data-step="export" type="button"><span class="num">&#10003;</span><span class="lbl" data-i18n="step-salva">Salva</span><span class="done"></span></button>
+  </nav>
+
+  <main id="workspace">
+    <aside id="tools">
+      <section class="tool hidden" data-tab="detect">
+        <div class="tool-body">
+          <p class="hint" data-i18n="detect-hint">Trova le singole fotografie dentro una scansione con piu' foto.</p>
+          <button id="btn-detect" type="button" class="primary" data-i18n="detect-btn">Rileva le foto nella scansione</button>
+          <div id="detect-result" class="infobox hidden"></div>
+          <button id="btn-skip-crop" type="button" class="hidden" data-i18n="detect-skip">Prosegui senza ritagliare</button>
+          <div class="modepicker">
+            <label><input type="radio" name="editmode" value="none" checked /><span data-i18n="modalita-sfoglia">Sfoglia (zoom e pan)</span></label>
+            <label><input type="radio" name="editmode" value="crop" /><span data-i18n="modalita-rettangolo">Ritaglia un rettangolo</span></label>
+            <label><input type="radio" name="editmode" value="persp" /><span data-i18n="modalita-angoli">Raddrizza con 4 angoli</span></label>
+          </div>
+          <div id="manual-actions" class="hidden">
+            <button id="btn-apply-crop" type="button" class="primary" data-i18n="applica-ritaglio">Applica il ritaglio</button>
+            <button id="btn-apply-persp" type="button" class="primary" data-i18n="applica-prospettiva">Applica la prospettiva</button>
+            <button id="btn-clear-selection" type="button" class="ghost" data-i18n="annulla-selezione">Annulla la selezione</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool hidden" data-tab="resize">
+        <div class="tool-body">
+          <p class="hint" data-i18n="resize-hint">Larghezza finale in pixel: l'altezza resta proporzionale.</p>
+          <div class="grid2">
+            <label class="field">
+              <span data-i18n="larghezza">Larghezza (px)</span>
+              <input type="number" id="resize-w" min="1" max="12000" />
+            </label>
+            <label class="field">
+              <span data-i18n="altezza">Altezza (px)</span>
+              <input type="number" id="resize-h" min="1" max="12000" />
+            </label>
+          </div>
+          <div id="resize-preview" class="infobox hidden"></div>
+          <p class="hint small" data-i18n="resize-rapido">Ingrandimento rapido (qualita' standard, senza AI)</p>
+          <div class="grid3">
+            <button type="button" data-fast="2">2x</button>
+            <button type="button" data-fast="4">4x</button>
+            <button type="button" data-fast="8">8x</button>
+          </div>
+          <button id="btn-apply-resize" type="button" class="primary" data-i18n="applica-dimensioni">Applica le dimensioni</button>
+          <details class="adv">
+            <summary data-i18n="opzioni-avanzate">Opzioni avanzate</summary>
+            <label class="field">
+              <span data-i18n="metodo">Metodo</span>
+              <select id="resize-method">
+                <option value="lanczos" data-i18n="metodo-lanczos" selected>Lanczos (qualita' migliore)</option>
+                <option value="bicubic" data-i18n="metodo-bicubico">Bicubico</option>
+                <option value="bilinear" data-i18n="metodo-bilineare">Bilineare (piu' veloce)</option>
+                <option value="area" data-i18n="metodo-area">Area</option>
+                <option value="nearest" data-i18n="metodo-nearest">Nearest-neighbor</option>
+              </select>
+            </label>
+            <label class="field">
+              <span data-i18n="nitidezza">Nitidezza finale:</span> <span id="sharpen-label" data-i18n="disattiva">disattiva</span>
+              <input type="range" id="resize-sharpen" min="0" max="1.5" step="0.05" value="0" />
+            </label>
+            <p class="hint small" data-i18n="resize-ai-hint">Per l'ingrandimento di qualita' usa la tappa 6 (AI).</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="tool hidden" data-tab="bg">
+        <div class="tool-body">
+          <p class="hint" data-i18n="bg-hint">Un clic: l'IA individua il soggetto e toglie lo sfondo.</p>
+          <label class="field">
+            <span data-i18n="bg-modalita">Modalita'</span>
+            <select id="bg-model"></select>
+          </label>
+          <div class="modline">
+            <span class="infobtn" data-i18n-title="info-modello" title="Informazioni sul modello e sulla sua licenza">&#9432;</span>
+            <div id="bg-licenza" class="licinfo"></div>
+          </div>
+          <button id="btn-bg-ai" type="button" class="primary" data-i18n="bg-rimuovi">Rimuovi lo sfondo</button>
+          <details class="adv">
+            <summary data-i18n="alternative-manuali">Alternative manuali</summary>
+            <button id="btn-bg-apply" type="button" data-i18n="bg-base">Rimozione base dai bordi</button>
+            <label class="check">
+              <input type="radio" name="editmode" value="bg" />
+              <span data-i18n="bg-clic">Clicca sullo sfondo da rimuovere</span>
+            </label>
+            <label class="field">
+              <span data-i18n="bg-tolleranza">Tolleranza colore:</span> <span id="lbl-bg-tol">10</span>
+              <input type="range" id="bg-tolerance" min="1" max="60" step="1" value="10" />
+            </label>
+            <p class="hint small" data-i18n="bg-trasparente">La parte tolta resta trasparente nel file PNG salvato.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="tool hidden" data-tab="volto">
+        <div class="tool-body">
+          <p class="hint" data-i18n="volto-hint">Un clic: l'IA restaura i visi; il resto resta intatto.</p>
+          <label class="field">
+            <span data-i18n="volto-restauratore">Restauratore</span>
+            <select id="volto-model">
+              <option value="volto-codeformer" data-i18n="volto-codeformer" selected>CodeFormer (piu' dettaglio)</option>
+              <option value="volto-gfpgan" data-i18n="volto-gfpgan">GFPGAN v1.4 (piu' naturale, licenza libera)</option>
+            </select>
+          </label>
+          <label class="field">
+            <span data-i18n="volto-rilevatore">Rilevatore</span>
+            <select id="volto-detector">
+              <option value="volto-det-retinaface" data-i18n="volto-r50" selected>RetinaFace R50 (piu' preciso)</option>
+              <option value="volto-det-retinaface25" data-i18n="volto-mob25">RetinaFace Mobile 0.25 (piu' rapido)</option>
+            </select>
+          </label>
+          <div class="modline">
+            <span class="infobtn" data-i18n-title="info-modello" title="Informazioni sul modello e sulla sua licenza">&#9432;</span>
+            <div id="volto-licenza" class="licinfo"></div>
+          </div>
+          <button id="btn-volto-ai" type="button" class="primary" data-i18n="volto-restaura">Restaura i volti</button>
+          <div id="fusione-volto" class="hidden">
+            <label class="field">
+              <span data-i18n="volto-visibilita">Visibilita' del restauro:</span> <span id="fusione-volto-val">100%</span>
+              <input type="range" id="fusione-volto-barra" min="0" max="100" step="1" value="100" />
+            </label>
+            <p class="hint small" data-i18n="volto-fusione-hint">0% = foto originale, 100% = restauro pieno. Aggiorna la foto in tempo reale.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool hidden" data-tab="adjust">
+        <div class="tool-body">
+          <p class="hint" data-i18n="adjust-hint">Regolazioni leggere e annullabili.</p>
+          <label class="field"><span data-i18n="luminosita">Luminosita'</span> <span id="lbl-brightness">0</span>
+            <input type="range" id="adj-brightness" min="-100" max="100" step="1" value="0" />
+          </label>
+          <label class="field"><span data-i18n="contrasto">Contrasto</span> <span id="lbl-contrast">0</span>
+            <input type="range" id="adj-contrast" min="-100" max="100" step="1" value="0" />
+          </label>
+          <label class="field"><span data-i18n="saturazione">Saturazione</span> <span id="lbl-saturation">0</span>
+            <input type="range" id="adj-saturation" min="-100" max="100" step="1" value="0" />
+          </label>
+          <label class="field">
+            <span data-i18n="riduzione-rumore">Riduzione rumore</span>
+            <select id="adj-noise">
+              <option value="0" data-i18n="disattiva" selected>Disattivata</option>
+              <option value="1" data-i18n="debole">Debole</option>
+              <option value="2" data-i18n="media">Media</option>
+            </select>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="adj-wb" />
+            <span data-i18n="correggi-colori">Correggi automaticamente i colori</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="adj-bw" />
+            <span data-i18n="bianco-nero">Trasforma in bianco e nero</span>
+          </label>
+          <button id="btn-apply-adjust" type="button" class="primary" data-i18n="applica-correzioni">Applica le correzioni</button>
+          <button id="btn-clear-adjust" type="button" class="ghost" data-i18n="azzera-regolazioni">Azzera le regolazioni</button>
+          <details class="adv">
+            <summary data-i18n="recupero-jpeg">Recupero JPEG</summary>
+            <label class="field">
+              <span data-i18n="intensita">Intensita'</span>
+              <select id="jpeg-strength">
+                <option value="0.4" data-i18n="lieve" selected>Lieve</option>
+                <option value="0.7" data-i18n="media">Media</option>
+                <option value="1" data-i18n="forte">Forte</option>
+              </select>
+            </label>
+            <button id="btn-jpeg-restore" type="button" data-i18n="ripristina-dettagli">Ripristina dettagli compressi</button>
+          </details>
+        </div>
+      </section>
+
+      <section class="tool hidden" data-tab="ai">
+        <div class="tool-body">
+          <p class="hint" data-i18n="ai-hint">Tutto sul computer: le foto non vengono inviate online.</p>
+          <label class="field">
+            <span data-i18n="ai-modello">Modello di ingrandimento</span>
+            <select id="ai-model"></select>
+          </label>
+          <div class="compare-mode" id="ai-scale" role="radiogroup" data-i18n-aria="quanto-ingrandire" aria-label="Quanto ingrandire">
+            <label><input type="radio" name="ai-scale" value="2" /><span>2&#215;</span></label>
+            <label><input type="radio" name="ai-scale" value="4" checked /><span>4&#215;</span></label>
+          </div>
+          <p id="ai-scale-warn" class="hint small hidden"></p>
+          <div class="modline">
+            <span class="infobtn" data-i18n-title="info-modello" title="Informazioni sul modello e sulla sua licenza">&#9432;</span>
+            <div id="ai-licenza" class="licinfo"></div>
+          </div>
+          <button id="btn-ai-apply" type="button" class="primary" data-i18n="ai-migliora">Migliora e ingrandisci</button>
+          <div id="fusione-ai" class="hidden">
+            <label class="field">
+              <span data-i18n="ai-visibilita">Visibilita' AI:</span> <span id="fusione-ai-val">100%</span>
+              <input type="range" id="fusione-ai-barra" min="0" max="100" step="1" value="100" />
+            </label>
+            <p class="hint small" data-i18n="ai-fusione-hint">0% = ingrandimento normale, 100% = versione AI. Aggiorna la foto in tempo reale.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool hidden" data-tab="export">
+        <div class="tool-body">
+          <p class="hint" data-i18n="export-hint">L'originale resta intatto; i dati EXIF vengono rimossi.</p>
+          <label class="field">
+            <span data-i18n="export-formato">Formato file</span>
+            <select id="export-format">
+              <option value="png" data-i18n="formato-png" selected>PNG (senza perdita di qualita')</option>
+              <option value="jpeg" data-i18n="formato-jpeg">JPEG (file piu' leggero)</option>
+              <option value="tiff" data-i18n="formato-tiff">TIFF</option>
+            </select>
+          </label>
+          <label class="field hidden" id="quality-row">
+            <span data-i18n="qualita-jpeg">Qualita' JPEG:</span> <span id="lbl-quality">92</span>
+            <input type="range" id="export-quality" min="40" max="95" step="1" value="92" />
+          </label>
+          <div id="export-info" class="infobox"></div>
+          <button id="btn-export" type="button" class="primary" data-i18n="salva-foto">Salva la foto</button>
+        </div>
+      </section>
+    </aside>
+
+    <div id="viewport" tabindex="0">
+      <div id="stage">
+        <div id="compare" class="mode-dopo">
+          <img id="img-before" alt="Prima" draggable="false" />
+          <div id="after-clip">
+            <img id="img-after" alt="Dopo" draggable="false" />
+          </div>
+          <div id="divider" tabindex="-1" data-i18n-aria="aria-divisore" aria-label="Divisore prima/dopo"></div>
+        </div>
+        <svg id="overlays" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div id="empty-state">
+        <p><strong data-i18n="vuoto-titolo">Nessuna fotografia caricata</strong></p>
+        <p data-i18n="vuoto-testo">Fai clic qui per scegliere la foto, oppure trascinala in questa area.</p>
+        <p class="hint small" data-i18n="vuoto-formati">Formati: PNG, JPEG, TIFF, BMP, WebP.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer id="statusbar">
+    <span id="info-file">--</span>
+    <span id="info-original">// </span>
+    <span id="info-current"></span>
+    <span id="info-method"></span>
+  </footer>
+
+  <div id="log-panel" class="hidden">
+    <div class="log-head">
+      <strong data-i18n="log-tecnico">Log tecnico</strong>
+      <button id="btn-log-close" type="button" class="ghost" data-i18n="chiudi">Chiudi</button>
+    </div>
+    <div id="log-content"></div>
+  </div>
+
+  <div id="settings-panel" class="hidden">
+    <div class="log-head">
+      <strong data-i18n="impostazioni">Impostazioni</strong>
+      <button id="btn-settings-close" type="button" class="ghost" data-i18n="chiudi">Chiudi</button>
+    </div>
+    <div class="set-body">
+      <p class="set-label" data-i18n="lingua">Lingua</p>
+      <div id="lang-list">
+        <button type="button" data-lang="sistema"><span class="bandiera-sys">&#127760;</span><span data-i18n="lingua-sistema">Lingua di sistema</span></button>
+        <button type="button" data-lang="it"><span class="bandiera bandiera-it" title="Italiano"></span><span>Italiano</span></button>
+        <button type="button" data-lang="en"><span class="bandiera bandiera-gb" title="English"></span><span>English</span></button>
+        <button type="button" data-lang="es"><span class="bandiera bandiera-es" title="Espa&ntilde;ol"></span><span>Espa&ntilde;ol</span></button>
+        <button type="button" data-lang="fr"><span class="bandiera bandiera-fr" title="Fran&ccedil;ais"></span><span>Fran&ccedil;ais</span></button>
+        <button type="button" data-lang="de"><span class="bandiera bandiera-de" title="Deutsch"></span><span>Deutsch</span></button>
+        <button type="button" data-lang="pt"><span class="bandiera bandiera-pt" title="Portugu&ecirc;s"></span><span>Portugu&ecirc;s</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="message" class="hidden" role="alert"></div>
+
+  <aside id="ai-status" class="hidden">
+    <div id="ai-status-title"></div>
+    <div class="prog-track"><div id="ai-status-bar"></div></div>
+    <div id="ai-status-info"></div>
+  </aside>
+
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

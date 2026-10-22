@@ -1,0 +1,10 @@
+/target/
+/target-x86_64-pc-windows-gnu/
+node_modules/
+src-tauri/bin/
+src-tauri/target/
+src-tauri/resources/
+*.log
+.DS_Store
+.tools/
+portable/

@@ -1,0 +1,13 @@
+{
+  "name": "photo-restore",
+  "version": "0.2.0",
+  "private": true,
+  "description": "App desktop per restauro fotografico (upscaling, face restore, ritaglio, correzioni conservative)",
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  },
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build"
+  }
+}

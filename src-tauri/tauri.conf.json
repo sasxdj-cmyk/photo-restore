@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Photo Restore",
+  "version": "0.2.0",
+  "identifier": "it.photorestore.desktop",
+  "build": {
+    "frontendDist": "../ui"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Photo Restore - Restauro fotografico",
+        "width": 1360,
+        "height": 720,
+        "minWidth": 1000,
+        "minHeight": 640,
+        "center": true,
+        "dragDropEnabled": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'",
+      "assetProtocol": {
+        "enable": false,
+        "scope": ["**"]
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": ["icons/icon.ico"],
+    "resources": ["resources/modelli/*", "resources/runtime/onnxruntime.dll"],
+    "shortDescription": "Restauro fotografico locale, tutto incluso",
+    "longDescription": "Restaura fotografie e scansioni sul computer: ritaglio, raddrizzamento prospettico, correzioni conservative, ridimensionamento e ingrandimento AI. Nessun contenuto viene ricostruito con inpainting; l'originale non viene mai modificato. Tutti i modelli AI e la runtime sono inclusi nell'installer: nessun download necessario e il programma funziona completamente offline.",
+    "publisher": "Photo Restore",
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+[workspace]
+resolver = "2"
+members = ["src-tauri", "core", "inference"]
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+version = "0.2.0"
+
+[workspace.dependencies]
+image = "0.25"
+imageproc = "0.27"
+rayon = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", default-features = false }
+thiserror = "2"

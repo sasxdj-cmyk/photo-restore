@@ -1,0 +1,24 @@
+[package]
+name = "pr-inference"
+version = "0.2.0"
+description = "Inferenza locale per Photo Restore (ONNX Runtime)"
+license = "MIT"
+edition = "2021"
+
+[dependencies]
+image.workspace = true
+rayon.workspace = true
+thiserror.workspace = true
+ndarray = "0.17"
+# runtime OFFIX Runtime caricato a runtime (load-dynamic): la DLL ufficiale
+# win-x64 (VC++ ABI) viene caricata sul posto con libloading, cosi' non servono
+# binari precompilati di ort-sys per il target pc-windows-gnu.
+ort = { version = "2.0.0-rc.14", default-features = false, features = ["std", "ndarray", "load-dynamic", "half"] }
+half = "2"
+ureq = { version = "2", default-features = false, features = ["tls", "gzip"] }
+sha2 = "0.10"
+zip = { version = "9", default-features = false, features = ["deflate"] }
+serde.workspace = true
+
+[dev-dependencies]
+tempfile = "3"
